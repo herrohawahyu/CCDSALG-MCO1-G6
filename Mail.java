@@ -22,12 +22,12 @@ public class Mail
     { 
         return schoolAddress; 
     }
-
+    
     public double getDistance() 
     { 
         return distance; 
     }
-
+    
     private String origin;
     private String destinationCity;
     private String schoolAddress;
