@@ -10,7 +10,6 @@ public class MailmanDriver {
     public static void main(String[] args) {
         Scanner kb = new Scanner(System.in);
         ArrayList<School> schoolList = new ArrayList<>();        
-        Stack<Mail> mailStack = new Stack<Mail>();
         boolean play = true;
 
         while (play) {
