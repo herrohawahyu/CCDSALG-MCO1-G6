@@ -14,7 +14,7 @@ public class MailmanDriver {
         boolean play = true;
 
         while (play) {
-            ArrayList<Mail> mailBag = new ArrayList<>();
+            Stack<Mail> mailBag = new Stack<Mail>();
             int i;
             System.out.println("\n Welcome to the Mailman Simulation!");
             System.out.println("[1] Start!");
@@ -75,26 +75,37 @@ public class MailmanDriver {
                             String destinationCity = targetSchool.getCity();
                             double distance = targetSchool.getDistancePO();
                             Mail mail = new Mail(currentCity, destinationCity, Address, distance);
-                            mailBag.add(mail);
+                            mailBag.push(mail);
                         } else {
                             System.out.println("Invalid destination. Please enter a valid school address.");
                             i--;
                         }
                     }
-                    System.out.println("Mail bag is full!");
+                    System.out.println("Done collecting from PO box!");
                     
                     System.out.println("Getting mail for current city...");
-                    for (Mail mail : mailBag) {
-                        if (mail.getOriginCity().equalsIgnoreCase(currentCity)) {
-                            mailStack.push(mail);
+                    ArrayList<Mail> localMail = new ArrayList<>();
+                    Stack<Mail> tempStack = new Stack<>();
+                    while (!mailBag.isEmpty()) {
+                        if (mailBag.peek().getOriginCity().equals(currentCity)) {
+                            localMail.add(mailBag.pop());
+                        } else {
+                            tempStack.push(mailBag.pop());
                         }
                     }
                     
+                    //now return the non-local mail back to the mail bag
+                    while (!tempStack.isEmpty()) {
+                        mailBag.push(tempStack.pop());
+                    }
+                   
                     System.out.println("Sorting mail by distance from the City Post Office...");
+                    quickSortMail(localMail, 0, localMail.size() - 1);
+
 
                     System.out.println("Delivering mail...");
 
-                    for (Mail mail : mailBag) {
+                    for (Mail mail : localMail) {
                         System.out.println("Delivering mail from " + mail.getOriginCity() + " to " + mail.getSchoolAddress());
                     }
                     
@@ -174,31 +185,30 @@ public class MailmanDriver {
     }
     
     private static int partition(ArrayList<Mail> mailBag, int low, int high) {
-        //method used for quicksort using lomuto algorithm 
-        Mail pivot = mailBag.get(mailBag.size() - 1); // last element
-        Mail temp;
-        int i = -1; // index of smaller element
-                    
-        for (int j = 0; j < mailBag.size() - 1; j++) {
-            if (mailBag.get(j).getDistance() > pivot.getDistance()) {
+        // method used for quicksort using Lomuto partition scheme
+        Mail pivot = mailBag.get(high);
+        int i = low - 1;
+
+        for (int j = low; j < high; j++) {
+            if (mailBag.get(j).getDistance() <= pivot.getDistance()) {
                 i++;
-                // swap mailBag[i] and mailBag[j]
-                temp = mailBag.get(i);
+                Mail temp = mailBag.get(i);
                 mailBag.set(i, mailBag.get(j));
                 mailBag.set(j, temp);
             }
         }
-        
-        //swap mailBag[i + 1] and pivot
-        temp = mailBag.get(i + 1);
-        mailBag.set(i + 1, pivot); 
-        mailBag.set(mailBag.size() - 1, temp);
-        
+
+        Mail temp = mailBag.get(i + 1);
+        mailBag.set(i + 1, mailBag.get(high));
+        mailBag.set(high, temp);
+        return i + 1;
     }
 
-    private static void quickSortMail(ArrayList<Mail> mailBag) {
-    // sorts the arraylist from greatest to smallest distance in place
-    // 
-        
+    private static void quickSortMail(ArrayList<Mail> mailBag, int low, int high) {
+        if (low < high) {
+            int pivotIndex = partition(mailBag, low, high);
+            quickSortMail(mailBag, low, pivotIndex - 1);
+            quickSortMail(mailBag, pivotIndex + 1, high);
+        }
     }
 }
