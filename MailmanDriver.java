@@ -3,12 +3,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Stack;
 
 public class MailmanDriver {
 
     public static void main(String[] args) {
         Scanner kb = new Scanner(System.in);
         ArrayList<School> schoolList = new ArrayList<>();        
+        Stack<Mail> mailStack = new Stack<Mail>();
         boolean play = true;
 
         while (play) {
@@ -71,7 +73,8 @@ public class MailmanDriver {
                         
                         if (targetSchool != null) {
                             String destinationCity = targetSchool.getCity();
-                            Mail mail = new Mail(currentCity, destinationCity, Address);
+                            double distance = targetSchool.getDistancePO();
+                            Mail mail = new Mail(currentCity, destinationCity, Address, distance);
                             mailBag.add(mail);
                         } else {
                             System.out.println("Invalid destination. Please enter a valid school address.");
@@ -79,8 +82,17 @@ public class MailmanDriver {
                         }
                     }
                     System.out.println("Mail bag is full!");
+                    
+                    System.out.println("Getting mail for current city...");
+                    for (Mail mail : mailBag) {
+                        if (mail.getOriginCity().equalsIgnoreCase(currentCity)) {
+                            mailStack.push(mail);
+                        }
+                    }
+                    
+                    System.out.println("Sorting mail by distance from the City Post Office...");
 
-                    System.out.println("Delivering mails...");
+                    System.out.println("Delivering mail...");
 
                     for (Mail mail : mailBag) {
                         System.out.println("Delivering mail from " + mail.getOriginCity() + " to " + mail.getSchoolAddress());
@@ -98,7 +110,7 @@ public class MailmanDriver {
         kb.close();
     }
 
-    public static boolean loadMapData(String filePath, ArrayList<School> schoolList) {
+    private static boolean loadMapData(String filePath, ArrayList<School> schoolList) {
         boolean success = true;
         schoolList.clear();
 
@@ -159,5 +171,34 @@ public class MailmanDriver {
             i++;
         }
       return matchedSchool;
+    }
+    
+    private static int partition(ArrayList<Mail> mailBag, int low, int high) {
+        //method used for quicksort using lomuto algorithm 
+        Mail pivot = mailBag.get(mailBag.size() - 1); // last element
+        Mail temp;
+        int i = -1; // index of smaller element
+                    
+        for (int j = 0; j < mailBag.size() - 1; j++) {
+            if (mailBag.get(j).getDistance() > pivot.getDistance()) {
+                i++;
+                // swap mailBag[i] and mailBag[j]
+                temp = mailBag.get(i);
+                mailBag.set(i, mailBag.get(j));
+                mailBag.set(j, temp);
+            }
+        }
+        
+        //swap mailBag[i + 1] and pivot
+        temp = mailBag.get(i + 1);
+        mailBag.set(i + 1, pivot); 
+        mailBag.set(mailBag.size() - 1, temp);
+        
+    }
+
+    private static void quickSortMail(ArrayList<Mail> mailBag) {
+    // sorts the arraylist from greatest to smallest distance in place
+    // 
+        
     }
 }

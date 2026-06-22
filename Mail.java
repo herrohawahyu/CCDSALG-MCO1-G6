@@ -1,10 +1,11 @@
 public class Mail 
 {
-    public Mail(String origin, String destinationCity, String schoolAddress) 
+    public Mail(String origin, String destinationCity, String schoolAddress, double distance) 
     {
         this.origin = origin;
         this.destinationCity = destinationCity;
         this.schoolAddress = schoolAddress;
+        this.distance = distance;
     }
 
     public String getOriginCity() 
@@ -21,8 +22,14 @@ public class Mail
     { 
         return schoolAddress; 
     }
-    
+
+    public double getDistance() 
+    { 
+        return distance; 
+    }
+
     private String origin;
     private String destinationCity;
     private String schoolAddress;
+    private double distance;
 }
