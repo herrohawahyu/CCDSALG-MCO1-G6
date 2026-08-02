@@ -2,35 +2,35 @@ public class NonLinearMapList
 {
     public NonLinearMapList(String city, String place1, String place2, double distance) 
     {
-        this.city = city;
-        this.place1 = place1;
-        this.place2 = place2;
-        this.distance = distance;
+        this.CITY = city;
+        this.PLACE1 = place1;
+        this.PLACE2 = place2;
+        this.DISTANCE = distance;
     }
     
     public String getCity() 
     { 
-        return city; 
+        return CITY; 
     }
 
     public String getPlace1() 
     { 
-        return place1; 
+        return PLACE1; 
     }
     
     public String getPlace2()
     { 
-        return place2; 
+        return PLACE2; 
     }
 
     public double getDistance()
     {
-        return distance;
+        return DISTANCE;
     }
 
 
-    private String city;
-    private String place1;
-    private String place2;
-    private double distance;
+    private final String CITY;
+    private final String PLACE1;
+    private final String PLACE2;
+    private final double DISTANCE;
 }

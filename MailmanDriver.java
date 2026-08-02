@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Stack;
+import java.util.HashMap;
 
 public class MailmanDriver {
 
     public static void main(String[] args) {
         Scanner kb = new Scanner(System.in);
-        ArrayList<School> schoolList = new ArrayList<>();        
+        Graph cityGraph = new Graph();
+        HashMap<String, Graph> localGraphs = new HashMap<>();
         boolean play = true;
 
         while (play) {
@@ -22,16 +24,19 @@ public class MailmanDriver {
             String choice = kb.nextLine();
 
             if (choice.equals("1")) {
+                System.out.print("Location of the Post Office Map: ");
+                String postOfficeFilePath = kb.nextLine();
                 System.out.print("Location of the Map: ");
                 String filePath = kb.nextLine();
 
-                boolean loaded = loadMapData(filePath, schoolList);
+                boolean loadedPostOffice = loadPostOfficeData(postOfficeFilePath, cityGraph);
+                boolean loadedMap = loadMapData(filePath, cityGraph);
 
-                if (loaded) {
+                if (loadedMap && loadedPostOffice) {
 
-                    System.out.println("Choose a starting City Post Office from the following list:");
+                    System.out.println("Choose a starting City Post Off/ce from the following list:");
                 
-                    String[] cities = getCities(schoolList);
+                    String[] cities = getCities(cityGraph);
                     for (i = 0; i < cities.length; i++) {
                         System.out.println("[" + (i + 1) + "] " + cities[i]);
                     }
@@ -120,9 +125,45 @@ public class MailmanDriver {
         kb.close();
     }
 
-    private static boolean loadMapData(String filePath, ArrayList<School> schoolList) {
+    private static boolean loadPostOfficeData(String filePath, Graph graph) {
         boolean success = true;
-        schoolList.clear();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line = br.readLine(); // skip header
+            line = br.readLine();
+
+            while (line != null) {
+                 String[] data = line.split(",");
+                 if (data.length == 3) {
+                        //remove the last two words from the city names and trim whitespace
+                        String city1 = data[0].replace(" Post Office", "").trim();
+                        String city2 = data[1].replace(" Post Office", "").trim();
+                        double distance = Double.parseDouble(data[2].trim());
+                        
+                        if (!graph.containsNode(city1)) {
+                            graph.addNode(new Node(city1));
+                        }
+                        
+                        if (!graph.containsNode(city2)) {
+                            graph.addNode(new Node(city2));
+                        }
+                        
+                        //now add the edge between the two nodes
+                        graph.addUndirectedEdge(city1, city2, distance);
+
+                    }
+                    line = br.readLine();
+                }
+            }
+        catch (IOException | NumberFormatException e) {
+            System.out.println("[ERROR] Failed to properly read or parse the CSV file structure.");
+            success = false;
+        }
+
+        return success;
+    }
+    private static boolean loadMapData(String filePath, Map <String, Graph> localGraphs) {
+        boolean success = true;
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line = br.readLine(); // skip header
@@ -132,11 +173,24 @@ public class MailmanDriver {
                  String[] data = line.split(",");
                  if (data.length == 4) {
                         String city = data[0].trim();
-                        String address = data[2].trim();
+                        String node1_name = data[1].trim();
+                        String node2_name = data[2].trim();
                         double distance = Double.parseDouble(data[3].trim());
+                        
+                        if (!localGraphs.containsKey(city)) {
+                            localGraphs.put(city, new CityGraph(city));
+                        }
+                        
+                        Graph cityGraph = localGraphs.get(city);
+                        if (cityGraph.getNode(node1_name) == null) {
+                            cityGraph.addNode(new Node(node1_name));
+                        }
+                        if (cityGraph.getNode(node2_name) == null) {
+                            cityGraph.addNode(new Node(node2_name));
+                        }
+                        cityGraph.addUndirectedEdge(node1_name, node2_name, distance);
 
-                        School school = new School(city, address, distance);
-                        schoolList.add(school);
+                        
                     }
                     line = br.readLine();
                 }

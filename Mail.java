@@ -2,27 +2,27 @@ public class Mail
 {
     public Mail(String origin, String destinationCity, String schoolAddress) 
     {
-        this.origin = origin;
-        this.destinationCity = destinationCity;
-        this.schoolAddress = schoolAddress;
+        this.ORIGIN = origin;
+        this.DESTINATION_CITY = destinationCity;
+        this.SCHOOL_ADDRESS = schoolAddress;
     }
 
     public String getOriginCity() 
     { 
-        return origin; 
+        return ORIGIN; 
     }
 
     public String getDestinationCity() 
     { 
-        return destinationCity; 
+        return DESTINATION_CITY; 
     }
 
     public String getSchoolAddress() 
     { 
-        return schoolAddress; 
+        return SCHOOL_ADDRESS; 
     }
 
-    private String origin;
-    private String destinationCity;
-    private String schoolAddress;
+    private final String ORIGIN;
+    private final String DESTINATION_CITY;
+    private final String SCHOOL_ADDRESS;
 }
